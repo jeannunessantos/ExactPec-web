@@ -7,6 +7,8 @@ import {DetalheAnimais} from './pages/cadastro/animais/detail'
 import {Layout} from './components/layout'
 import { New } from './pages/dashboard/new'
 import { Register } from './pages/register'
+import { PesquisarAnimais } from './pages/cadastro/animais'
+import { Private } from './routes/Private'
 
 const router = createBrowserRouter([
   {
@@ -17,20 +19,24 @@ const router = createBrowserRouter([
         element: <Home/>
       },
       {
-        path:"/animal",
-        element: <CadastroAnimais/>
+        path:"/pesquisa/animal",
+        element: <Private><PesquisarAnimais/></Private>
       },
       {
-        path:"/animal/:id",
-        element: <DetalheAnimais/>
+        path:"/cadastro/animal",
+        element: <Private><CadastroAnimais/></Private>
+      },
+      {
+        path:"/detalhe/animal/:id",
+        element: <Private><DetalheAnimais/></Private>
       },
       {
         path:"/dashboard",
-        element: <Dashboard/>
+        element: <Private><Dashboard/></Private>
       },
       {
         path:"/dashboard/new",
-        element: <New/>
+        element: <Private><New/></Private>
       }
     ]
   },
