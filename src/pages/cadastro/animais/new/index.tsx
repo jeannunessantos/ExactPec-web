@@ -1,5 +1,5 @@
 import { ChangeEvent, useContext, useState } from "react";
-import { FiUpload } from "react-icons/fi";
+import { FiUpload, FiTrash } from "react-icons/fi";
 import { Container } from "../../../../components/container";
 import { DashboardHeader } from "../../../../components/painelHeader";
 import { useForm } from 'react-hook-form'
@@ -9,32 +9,49 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import {AuthContext} from '../../../../contexts/AuthContext'
 import {v4 as uuidV4} from 'uuid'
 
- import {storage} from '../../../../services/firebaseConnection'
+ import {storage,db} from '../../../../services/firebaseConnection'
  import {
     ref,
     uploadBytes,
     getDownloadURL,
     deleteObject
  } from 'firebase/storage'
+import {addDoc, collection} from 'firebase/firestore'
+
 
 const schema = z.object({
     nome: z.string().nonempty("O campo nome é obrigatório"),
     numero: z.string().min(1, "O campo número é obrigatório"), 
     anoNascimento: z.string().nonempty("O campo ano de nascimento é obrigatório"), 
-    sexo: z.string().nonempty("O campo sexo é obrigatório"), 
+    sexo: z.string().nullable().refine((sexo) => {
+        return ['0', '1'].includes(sexo == null ? "" : sexo.toLowerCase());
+    }, {
+       message: 'O campo sexo é obrigatório.'
+    }),
     origem: z.string().nonempty("O campo origem é obrigatório"), 
     composicao: z.string().nonempty("O campo composição é obrigatório"), 
-    puroDeOrigemrigem: z.string().nonempty("O campo puro de origem é obrigatório"), 
+    puroDeOrigemrigem: z.string().nullable().refine((puroDeOrigemrigem) => {
+        return ['0', '1'].includes(puroDeOrigemrigem == null ? "" : puroDeOrigemrigem.toLowerCase());
+    }, {
+       message: 'O campo puro de origem é obrigatório'
+    }),
     pesoAoNascer: z.string().nonempty("O campo peso ao nascer é obrigatório"), 
     sisBov: z.string().nonempty("O campo SIS BOV é obrigatório"), 
     pesoDoDesmame: z.string().nonempty("O campo peso do desmame é obrigatório"), 
-    rgn: z.string().min(1).nonempty("O campo RGN é obrigatório"), 
+    rgn: z.string().min(1,"O campo RGN é obrigatório"),
     pelagem: z.string().nonempty("O campo pelagem é obrigatório"),
     observacao: z.string().nonempty("O campo observação é obrigatório") 
     
 })
 
 type FormData = z.infer<typeof schema>;
+interface ImageItemProps{
+    uid:string,
+    name:string,
+    previewUrl:string,
+    url:string
+}
+
 
 export function CadastroAnimais(){
     const {user} =  useContext(AuthContext)
@@ -43,8 +60,58 @@ export function CadastroAnimais(){
         mode:"onChange"
     })
 
+    const [animalImages, setAnimalImage] = useState<ImageItemProps[]>([]);
+    const [sexo, setSexo] = useState('');
+    const [puroDeOrigemrigem, setPuroDeOrigemrigem] = useState('');
+    
+    
+    const handleSexoChange = (event: any) => {
+        setSexo(event.target.value);
+      };
+
+      const handlePuroDeOrigemrigem = (event: any) => {
+        setPuroDeOrigemrigem(event.target.value);
+      };
+
     function onSubmit(data:FormData){
-        console.log(data);
+        if(animalImages.length == 0){
+            alert("Envie alguma imagem deste animal");
+            return;
+        }
+
+        const animalListImages = animalImages.map(animal => {
+            return{
+                uid: animal.uid,
+                name: animal.name,
+                url:animal.url
+            }
+        })
+
+        addDoc(collection(db,"Animais"),{
+            nome: data.nome,
+            numero: data.numero,
+            anoNascimento: data.anoNascimento,
+            origem: data.origem,
+            sexo: data.sexo,
+            composicao: data.composicao,
+            puroDeOrigemrigem: data.puroDeOrigemrigem,
+            pelagem: data.pelagem,
+            pesoAoNascer: data.pesoAoNascer,
+            pesoDoDesmame: data.pesoDoDesmame,
+            rgn: data.rgn,
+            sisBov: data.sisBov,
+            observacao: data.observacao,
+            userCadastro: user?.name,
+            userId: user?.uid,
+            dataCadastro: new Date(),
+            images: animalListImages
+        })
+        .then(() => {
+            reset();
+            setAnimalImage([]);
+        }).catch(() => {
+
+        })
     }
 
     async function handleFile(e:ChangeEvent<HTMLInputElement>){
@@ -71,11 +138,28 @@ export function CadastroAnimais(){
 
         uploadBytes(uploadRef, image)
         .then((snapshot) => {
-            getDownloadURL(snapshot.ref).then((getDownloadURL) => {
-                //Continuar...
+            getDownloadURL(snapshot.ref).then((downloadURL) => {
+                const imageItem = {
+                    name: uidImage,
+                    uid:currentUid,
+                    previewUrl: URL.createObjectURL(image),
+                    url: downloadURL
+                }
+                setAnimalImage((images) => [...images, imageItem])
             })
         })
+    }
 
+
+    async function handleDeleteImage(item: ImageItemProps){
+        const imagePath = `images/${item.uid}/${item.name}`;
+        const imageRef = ref(storage, imagePath);
+        try {
+            await deleteObject(imageRef);
+            setAnimalImage(animalImages.filter((animal) => animal.url !== item.url));
+        } catch (error) {
+            //tratar erro.            
+        }
     }
 
     return(
@@ -95,6 +179,19 @@ export function CadastroAnimais(){
                             onChange={handleFile} />
                         </div>
                     </button>
+                    {animalImages.map(item => (
+                        <div key={item.name} className="h-32 flex items-center justify-center">
+                            <button className="absolute" onClick={() => handleDeleteImage(item)}>
+                                <FiTrash size={28} color="#FFF"/>
+                            </button>
+                            <img src={item.previewUrl}
+                            className="rounded-lg w-full h-32 object-cover"
+                            alt="Foto do animal"
+                            />
+                        </div>
+                    ))}
+
+
                 </div>
                 <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-2">
                     <form className="w-full" 
@@ -134,15 +231,34 @@ export function CadastroAnimais(){
                         </div>
 
                         <div className="flex w-full mb-3 flex-row items-center gap-4">
-                        <div className="w-full">
-                                <p className="mb-2 font-medium">Sexo</p>
-                                <Input
-                                type="text"
-                                register={register}
-                                name="sexo"
-                                error={errors.sexo?.message}
-                                placeholder="Informe o sexo"
-                                />
+                            <div className="w-full space-x-4">
+                                <p className="font-medium">Sexo</p>
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("sexo")}
+                                        name="sexo"
+                                        id="sexo1"
+                                        value="0"
+                                        checked={sexo === '0'}
+                                        onChange={handleSexoChange}
+                                    />
+                                    <span className="ml-2">Macho</span>
+                                </label>
+
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("sexo")}
+                                        name="sexo"
+                                        id="sexo2"
+                                        value="1"
+                                        checked={sexo === '1'}
+                                        onChange={handleSexoChange}
+                                    />
+                                    <span className="ml-2">Fêmea</span>
+                                </label>
+                                {errors.sexo && <p className="mb-1 text-red-500">{errors.sexo?.message}</p>} 
                             </div>
 
                             <div className="w-full">
@@ -167,19 +283,37 @@ export function CadastroAnimais(){
                             </div>
                         </div>
 
-
-
                         <div className="flex w-full mb-3 flex-row items-center gap-4">
-                        <div className="w-full">
-                                <p className="mb-2 font-medium">Puro de origem</p>
-                                <Input
-                                type="text"
-                                register={register}
-                                name="puroDeOrigemrigem"
-                                error={errors.puroDeOrigemrigem?.message}
-                                placeholder=""
-                                />
+                            <div className="w-full space-x-4">
+                                <p className="font-medium">Puro de origem</p>
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("puroDeOrigemrigem")}
+                                        name="puroDeOrigemrigem"
+                                        id="puroDeOrigemrigem1"
+                                        value="0"
+                                        checked={puroDeOrigemrigem === '0'}
+                                        onChange={handlePuroDeOrigemrigem}
+                                    />
+                                    <span className="ml-2">SIM</span>
+                                </label>
+
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("puroDeOrigemrigem")}
+                                        name="puroDeOrigemrigem"
+                                        id="puroDeOrigemrigem2"
+                                        value="1"
+                                        checked={puroDeOrigemrigem === '1'}
+                                        onChange={handlePuroDeOrigemrigem}
+                                    />
+                                    <span className="ml-2">NÃO</span>
+                                </label>
+                                {errors.puroDeOrigemrigem && <p className="mb-1 text-red-500">{errors.puroDeOrigemrigem?.message}</p>} 
                             </div>
+
                             <div className="w-full">
                                 <p className="mb-2 font-medium">Peso do nascimento</p>
                                 <Input
@@ -248,7 +382,7 @@ export function CadastroAnimais(){
                             />
                            {errors.observacao && <p className="mb-1 text-red-500">{errors.observacao.message}</p>} 
                         </div>
-                        <button type="submit" className="w-full rounded-md bg-zinc-900 text-white font-medium h-10">
+                        <button type="submit" className="w-full flex-auto rounded-md bg-blue-500 text-white font-medium h-10">
                             Cadastrar
                         </button>
                     </form>
