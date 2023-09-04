@@ -1,10 +1,11 @@
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { FiUpload, FiTrash } from "react-icons/fi";
 import { Container } from "../../../../components/container";
 import { DashboardHeader } from "../../../../components/painelHeader";
 import { useForm } from 'react-hook-form'
 import { Input } from '../../../../components/input'
 import { z } from 'zod'
+import {toast} from 'react-hot-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {AuthContext} from '../../../../contexts/AuthContext'
 import {v4 as uuidV4} from 'uuid'
@@ -54,6 +55,7 @@ interface ImageItemProps{
 
 
 export function CadastroAnimais(){
+
     const {user} =  useContext(AuthContext)
     const {register, handleSubmit, formState: {errors}, reset} = useForm<FormData>({
         resolver:zodResolver(schema),
@@ -75,7 +77,7 @@ export function CadastroAnimais(){
 
     function onSubmit(data:FormData){
         if(animalImages.length == 0){
-            alert("Envie alguma imagem deste animal");
+            toast.error("Envie alguma imagem deste animal");
             return;
         }
 
@@ -107,6 +109,7 @@ export function CadastroAnimais(){
             images: animalListImages
         })
         .then(() => {
+            toast.success("Animal cadastrado com sucesso.")
             reset();
             setAnimalImage([]);
         }).catch(() => {
@@ -121,7 +124,7 @@ export function CadastroAnimais(){
             if(image.type === 'image/jpeg' || image.type === 'image/png'){
                 await handleUpload(image)
             }else{
-                alert("Envie uma imagem jpeg ou png!");/// adicionar o co
+                toast.error("Envie uma imagem jpeg ou png!")
             }
         }
     }
@@ -158,7 +161,6 @@ export function CadastroAnimais(){
             await deleteObject(imageRef);
             setAnimalImage(animalImages.filter((animal) => animal.url !== item.url));
         } catch (error) {
-            //tratar erro.            
         }
     }
 

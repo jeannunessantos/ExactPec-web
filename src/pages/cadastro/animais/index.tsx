@@ -3,7 +3,7 @@ import { FiEdit2, FiTrash2, FiImage } from "react-icons/fi";
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
-import { collection, getDocs, query, doc, deleteDoc, orderBy } from 'firebase/firestore'
+import { collection, getDocs, query, doc, deleteDoc, orderBy, where } from 'firebase/firestore'
 import { db, storage } from '../../../services/firebaseConnection'
 import { ref, deleteObject } from 'firebase/storage'
 import ModalImagem from './../../../components/modal/Imagem'
@@ -38,43 +38,84 @@ interface AnimaisProps{
 export function PesquisarAnimais(){
     const [animais, setAnimais] = useState<AnimaisProps[]>([])
     const [isExibeImagemAnimal, setIsExibeImagemAnimal] = useState(false);
+    const [input, setInput] = useState("")
 
     useEffect(() => {
-
-        function loadAnimais(){
-            const animaisRef = collection(db, "Animais")
-            const queryRef = query(animaisRef, orderBy("dataCadastro", "desc"))
-            getDocs(queryRef)
-            .then((snapshot) => {
-            let listAnimais = [] as AnimaisProps[];
-    
-            snapshot.forEach( doc => {
-                listAnimais.push({
-                    id: doc.id,
-                    nome: doc.data().nome,
-                    numero: doc.data().numero,
-                    anoNascimento: doc.data().anoNascimento,
-                    sexo: doc.data().sexo,
-                    origem: doc.data().origem,
-                    composicao: doc.data().composicao,
-                    puroDeOrigemrigem: doc.data().puroDeOrigemrigem,
-                    pesoAoNascer: doc.data().pesoAoNascer,
-                    sisBov: doc.data().sisBov,
-                    pesoDoDesmame: doc.data().pesoDoDesmame,
-                    rgn: doc.data().rgn,
-                    pelagem: doc.data().pelagem,
-                    observacao: doc.data().observacao,
-                    userCadastro: doc.data().userId,
-                    userId: doc.data().userId,
-                    dataCadastro: new Date(),
-                    images: doc.data().images
-                })
-            })
-            setAnimais(listAnimais);  
-            })
-        }
         loadAnimais();
     }, [])
+
+    function loadAnimais(){
+        const animaisRef = collection(db, "Animais")
+        const queryRef = query(animaisRef, orderBy("dataCadastro", "desc"))
+        getDocs(queryRef)
+        .then((snapshot) => {
+        let listAnimais = [] as AnimaisProps[];
+
+        snapshot.forEach( doc => {
+            listAnimais.push({
+                id: doc.id,
+                nome: doc.data().nome,
+                numero: doc.data().numero,
+                anoNascimento: doc.data().anoNascimento,
+                sexo: doc.data().sexo,
+                origem: doc.data().origem,
+                composicao: doc.data().composicao,
+                puroDeOrigemrigem: doc.data().puroDeOrigemrigem,
+                pesoAoNascer: doc.data().pesoAoNascer,
+                sisBov: doc.data().sisBov,
+                pesoDoDesmame: doc.data().pesoDoDesmame,
+                rgn: doc.data().rgn,
+                pelagem: doc.data().pelagem,
+                observacao: doc.data().observacao,
+                userCadastro: doc.data().userId,
+                userId: doc.data().userId,
+                dataCadastro: new Date(),
+                images: doc.data().images
+            })
+        })
+        setAnimais(listAnimais);  
+        })
+    }
+
+    async function handleSearchCar(){
+        if(input === ''){
+            loadAnimais();
+          return;
+        }
+        setAnimais([])
+        const q = query(collection(db, 'Animais'), 
+        where("nome", ">=", input),
+        where("nome", "<=", input + "\uf8ff")// \uf8ff  caractera para marcar o final da consulta e garantir todos os caracteres na consulta.
+        )
+
+        const querySnapshot = await getDocs(q)
+        let listAnimais = [] as AnimaisProps[];
+
+        querySnapshot.forEach(doc => {
+            listAnimais.push({
+                id: doc.id,
+                nome: doc.data().nome,
+                numero: doc.data().numero,
+                anoNascimento: doc.data().anoNascimento,
+                sexo: doc.data().sexo,
+                origem: doc.data().origem,
+                composicao: doc.data().composicao,
+                puroDeOrigemrigem: doc.data().puroDeOrigemrigem,
+                pesoAoNascer: doc.data().pesoAoNascer,
+                sisBov: doc.data().sisBov,
+                pesoDoDesmame: doc.data().pesoDoDesmame,
+                rgn: doc.data().rgn,
+                pelagem: doc.data().pelagem,
+                observacao: doc.data().observacao,
+                userCadastro: doc.data().userId,
+                userId: doc.data().userId,
+                dataCadastro: new Date(),
+                images: doc.data().images
+            })
+        })
+
+        setAnimais(listAnimais);
+    }
 
     function handleImageAnimal(isOpen: boolean) {
         setIsExibeImagemAnimal(isOpen);
@@ -110,6 +151,21 @@ export function PesquisarAnimais(){
 
     return(
         <Container>
+ <section className="bg-white p-4 rounded-lg w-full max-w-3xl mx-auto flex justify-center items-center gap-2">
+        <input
+          className="w-full border-2 rounded-lg h-9 px-3 outline-none"
+          placeholder="Digite o nome do animal..."
+          value={input}
+          onChange={ (e) => setInput(e.target.value) }
+        />
+        <button
+          className="bg-blue-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
+          onClick={handleSearchCar}
+        >
+          Buscar
+        </button>
+      </section>
+
             <main className="grid gird-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1">
             {animais && animais.length ? (
                 <div className="w-full max-w-screen-lg mx-auto mt-8 flex">
