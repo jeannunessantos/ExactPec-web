@@ -1,12 +1,11 @@
 import { Container } from "../../../components/container";
-import { FiEdit2, FiTrash2, FiImage } from "react-icons/fi";
-import { Link } from 'react-router-dom'
+import { FiEdit2, FiTrash2, FiFileText, FiPlusCircle } from "react-icons/fi";
+import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
 import { collection, getDocs, query, doc, deleteDoc, orderBy, where } from 'firebase/firestore'
 import { db, storage } from '../../../services/firebaseConnection'
 import { ref, deleteObject } from 'firebase/storage'
-import ModalImagem from './../../../components/modal/Imagem'
 
 interface AnimaisProps{
     id: string,
@@ -36,8 +35,8 @@ interface AnimaisProps{
   }
 
 export function PesquisarAnimais(){
+    const navigate = useNavigate();
     const [animais, setAnimais] = useState<AnimaisProps[]>([])
-    const [isExibeImagemAnimal, setIsExibeImagemAnimal] = useState(false);
     const [input, setInput] = useState("")
 
     useEffect(() => {
@@ -117,22 +116,20 @@ export function PesquisarAnimais(){
         setAnimais(listAnimais);
     }
 
-    function handleImageAnimal(isOpen: boolean) {
-        setIsExibeImagemAnimal(isOpen);
-    }
-
-    function onClose(){
-        setIsExibeImagemAnimal(false);
+    function handledetalhesAnimal(id:string){
+        navigate(`/detalhe/animal/${id}`);
     }
 
     function editarItem(id: string){
-        // Lógica para editar o item
-        console.log(`Editar item: ${id}`);
+      navigate(`/cadastro/animal/${id}`);
+    };
+    
+    function novoCadastro(){
+      navigate(`/cadastro/animal`);
     };
     
     async function excluirItem(animal: AnimaisProps){
         const itemAnimal = animal;
-
         const docRef = doc(db, "Animais", itemAnimal.id)
         await deleteDoc(docRef);
     
@@ -142,7 +139,7 @@ export function PesquisarAnimais(){
 
             try{
                 await deleteObject(imageRef)
-                setAnimais(animais.filter(animal => animal.userId !== itemAnimal.userId))
+                setAnimais(animais.filter(animal => animal.id !== itemAnimal.id))
             }catch(err){
                 console.log("ERRO AO EXCLUIR ESSA IMAGEM")
             }
@@ -151,86 +148,91 @@ export function PesquisarAnimais(){
 
     return(
         <Container>
- <section className="bg-white p-4 rounded-lg w-full max-w-3xl mx-auto flex justify-center items-center gap-2">
-        <input
-          className="w-full border-2 rounded-lg h-9 px-3 outline-none"
-          placeholder="Digite o nome do animal..."
-          value={input}
-          onChange={ (e) => setInput(e.target.value) }
-        />
-        <button
-          className="bg-blue-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
-          onClick={handleSearchCar}
-        >
-          Buscar
-        </button>
-      </section>
-
-            <main className="grid gird-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1">
-            {animais && animais.length ? (
-                <div className="w-full max-w-screen-lg mx-auto mt-8 flex">
-                    <div className="bg-gray-200 p-4">
-                        <div className="grid grid-cols-5 gap-2">
-                        <>
-                                <div className="col-span-1">
-                                <div className="font-bold">Nome</div>
-                                </div>
-                                <div className="col-span-1">
-                                    <div className="font-bold">Ano de Nascimento</div>
-                                </div>
-                                <div className="col-span-1">
-                                    <div className="font-bold">Peso Nasc</div>
-                                </div>
-                                <div className="col-span-1">
-                                    <div className="font-bold">Peso desmame</div>
-                                </div>
-                                <div className="col-span-1">
-                                    <div className="font-bold"></div>
-                                </div>   
-                            {animais.map((animal) => (
-                                <section key={animal.id} className="col-span-6 grid grid-cols-5 gap-2">
-                                    <div  className="col-span-6 grid grid-cols-5 gap-2"> {/* Criei uma sub-grid para organizar os elementos da linha */}
-                                        <div className="col-span-1">
-                                            <div className="bg-white p-2 border rounded shadow">{animal.nome}</div>
+          <div className="w-full">
+            <div className="flex-col">
+                <section className="bg-white p-4 rounded-lg w- max-w-3xl mx-auto flex justify-center items-center gap-2">
+                      <input
+                      className="w-full border-2 rounded-lg h-9 px-3 outline-none"
+                      placeholder="Digite o nome do animal..."
+                      value={input}
+                      onChange={ (e) => setInput(e.target.value) }
+                      />
+                      <button
+                      className="bg-blue-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
+                      onClick={handleSearchCar}
+                      >
+                      Buscar
+                      </button>
+                </section>
+                <main className="grid gird-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1">
+                  {animais && animais.length ? (
+                      <div className="overflow-x-auto">
+                      <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded" onClick={() => novoCadastro()}><FiPlusCircle size="20" /></button>
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr>
+                            <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                              Nome
+                            </th>
+                            <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                              Numero
+                            </th>
+                            <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                              RGN
+                            </th>
+                            <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                              SIS BOV
+                            </th>
+                            <th className="px-6 py-3 bg-gray-100 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                              Sexo
+                            </th>
+                            <th className="px-6 py-3 bg-gray-100 text-center text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                              Puro de origem
+                            </th>
+                          </tr>
+                        </thead>
+                        
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {animais.map((animal, index) => {
+                            const corFundo = index % 2 === 0 ? 'bg-blue-100' : 'bg-green-100';
+                              return (
+                                  <tr className={corFundo} key={animal.id}>
+                                      <td className="px-6 py-4 whitespace-no-wrap">{animal.nome}</td>
+                                      <td className="px-6 py-4 whitespace-no-wrap">{animal.numero}</td>
+                                      <td className="px-6 py-4 whitespace-no-wrap">{animal.rgn}</td>
+                                      <td className="px-6 py-4 whitespace-no-wrap">{animal.sisBov}</td>
+                                      <td className="px-6 py-4 whitespace-no-wrap">{animal.sexo ? "Macho" : "Fêmia"}</td>
+                                      <td className="px-6 py-4 whitespace-no-wrap text-center">{animal.puroDeOrigemrigem ? "Sim" : "Não"}</td>
+                                      <td className="px-6 py-4 whitespace-no-wrap text-right">
+                                        <div className="space-x-1">
+                                          <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded" onClick={() => editarItem(animal.id.toString())}><FiEdit2 size="20" />
+                                          </button>
+                                          <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded" onClick={() => excluirItem(animal)}><FiTrash2 size="20" />
+                                          </button>
+                                          <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded" onClick={() => handledetalhesAnimal(animal.id)}><FiFileText size="20" />
+                                          </button>
                                         </div>
-                                        <div className="col-span-1">
-                                            <div className="bg-white p-2 border rounded shadow">{animal.anoNascimento}</div>
-                                        </div>
-                                        <div className="col-span-1">
-                                            <div className="bg-white p-2 border rounded shadow">{animal.pesoAoNascer}</div>
-                                        </div>
-                                        <div className="col-span-1">
-                                            <div className="bg-white p-2 border rounded shadow">{animal.pesoDoDesmame}</div>
-                                        </div>
-                                        <div className="col-span-1">
-                                            <div className="flex space-x-2">
-                                                <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded" onClick={() => editarItem(animal.id.toString())}><FiEdit2 size="25"/></button>
-                                                <button className="bg-gray-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded" onClick={() => excluirItem(animal)}><FiTrash2 size="25"/></button>
-                                                <button className="bg-gray-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded">
-                                                    <FiImage size={24} color="#000" onClick={() => handleImageAnimal(true)} />
-                                                    <ModalImagem isOpen={isExibeImagemAnimal} onClose={onClose} imageUrl={animal.images[0].url} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-                            ))}
-
-                                </>    
-                        </div>
+                                    </td>
+                                  </tr>
+                              );
+                          })}
+                        </tbody> 
+                      </table>
                     </div>
-                </div>
-            ) : <div className="flex flex-col items-center justify-center">
+                  ) : 
+                  <div className="flex flex-col items-center justify-center">
                     <p className="font-medium">Ops, animais não encontrados...</p>
                         <Link 
                             to="/cadastro/animal"
-                            className="bg-slate-600 my-3 p-1 px-3 text-white font-medium rounded"
+                            className="bg-blue-500 hover:bg-blue-400 my-3 p-1 px-3 text-white font-medium rounded"
                         >
                             Cadastrar animal
                         </Link>
-                    </div>
-        }
-            </main>
+                  </div>
+                  }
+                </main>
+              </div>
+            </div>
         </Container>
     )
 }

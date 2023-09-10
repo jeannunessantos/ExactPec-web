@@ -71,17 +71,14 @@ useEffect(() => {
     console.log(animal)
 },[id])
 
-function formatarDataParaString(data:Date){
-    const dia = String(data.getDate()).padStart(2, '0');
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const ano = data.getFullYear();
-  
-    return `${dia}/${mes}/${ano}`;
+function formatarDataString(dataString:string) {
+    const data = new Date(dataString);
+    return data.toLocaleDateString();
 }
+
     return(
         <Container>
             <div className="flex flex-col items-center justify-center">
-                    <h1 className="font-sans">Detalhes do animal</h1>
                         <Link 
                             to="/pesquisa/animal"
                             className="bg-slate-600 my-3 p-1 px-3 text-white font-medium rounded"
@@ -90,79 +87,85 @@ function formatarDataParaString(data:Date){
                         </Link>
                     </div>
             {animal && (
-                <main className='w-full bg-white rounded-lg p-6 my-4'>
-                    <div className='flex flex-col sm:flex-row mb-4 items-center justify-between'>
-                        <h1 className='font-bold text-3xl text-black'>{animal?.nome != undefined ? animal?.nome : animal?.numero}</h1>
-                        <h1 className='font-bold text-3xl text-black'>Numero: {animal?.numero}</h1>
-                        <h1 className='font-bold text-3xl text-black'>Data de cadastro: {formatarDataParaString(animal?.dataCadastro)}</h1>
+                <main className='w-full bg-white rounded-lg p-3 my-2'>
+                    <div className='flex flex-col sm:flex-row mb-2 items-center justify-between'>
+                        <h1 className='font-bold text-2xl text-black'>{animal?.nome != undefined ? animal?.nome : animal?.numero}</h1>
+                        <h1 className='font-bold text-2xl text-black'>Numero: {animal?.numero}</h1>
+                        <h1 className='font-bold text-2xl text-black'>Data de cadastro: {formatarDataString(animal.dataCadastro.toString())}</h1>
                     </div>
-                    <div className='flex w-full gap-6 my-4'>
-                        <div className='flex flex-col gap-4'>
-                            <div>
-                                <p>Ano de nascimento:</p>
-                                <strong>{animal.anoNascimento}</strong>
+                <div className='w-full flex flex-col sm:flex-row mb-2 items-center justify-between '>
+                    <div className='flex-col'>
+                        <div className='w-auto'>
+                            <div className='flex w-full gap-6 my-3 '>
+                                <div className='flex gap-6'>
+                                    <div>
+                                        <p>Ano de nasc: <strong>{formatarDataString(animal.anoNascimento)}</strong></p>
+                                    </div>
+                                    <div>
+                                        <p>Sexo: <strong>{animal.sexo ? "Macho" : "Fêmea"}</strong></p>
+                                    </div>
+                                </div>
+                                <div className='flex gap-6'>
+                                    <div>
+                                        <p>Origem: <strong>{animal.origem}</strong></p>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <p>Sexo:</p>
-                                <strong>{animal.sexo ? "Macho" : "Fêmea"}</strong>
+                            <hr/>
+                            <div className='flex w-full gap-6 my-3'>
+                                <div className='flex gap-6'>
+                                    <div>
+                                        <p>Peso no nasc: <strong>{animal.pesoAoNascer}</strong></p>
+                                    </div>
+                                    <div>
+                                        <p>Peso no desmame: <strong>{animal.pesoDoDesmame}</strong></p>
+                                    </div>
+                                </div>
+                                <div className='flex gap-6'> 
+                                    <div>
+                                        <p>RGN: <strong>{animal.rgn}</strong></p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className='flex flex-col gap-4'>
-                            <div>
-                                <p>Origem:</p>
-                                <strong>{animal.origem}</strong>
+                            <hr/>
+                            <div className='flex w-full gap-6 my-3'>
+                                <div className='flex gap-6'>
+                                    <div>
+                                        <p>Puro de origem: <strong>{animal.puroDeOrigemrigem ? "Sim" : "Não"}</strong></p>
+                                    </div>
+                                </div>
+                                <div className='flex gap-6'>
+                                    <div>
+                                        <p>Pelagem: <strong>{animal.pelagem}</strong></p>
+                                    </div>
+                                    <div>
+                                        <p>SISBOV: <strong>{animal.sisBov}</strong></p>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <p>Composicao:</p>
-                                <strong>{animal.composicao}</strong>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className='flex w-full gap-6 my-4'>
-                        <div className='flex flex-col gap-4'>
-                            <div>
-                                <p>Puro de origem:</p>
-                                <strong>{animal.puroDeOrigemrigem ? "Sim" : "Não"}</strong>
+                            <hr/>
+                                <div className='flex w-full gap-6 my-3'>
+                                    <div className='flex gap-6'>
+                                        <div>
+                                            <p>Composicao: <strong>{animal.composicao}</strong></p>
+                                        </div>
+                                        <div>
+                                            <p>Observação: <strong>{animal.observacao}</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className='flex flex-col gap-4'>
-                            
-                            <div>
-                                <p>Pelagem:</p>
-                                <strong>{animal.pelagem}</strong>
-                            </div>
-                        </div>
-                    </div>
 
-                <div className='flex w-full gap-6 my-4'>
-                    <div className='flex flex-col gap-4'>
+
+                        <div className='lg:w-7/12 sm: w-full'>
                             <div>
-                                <p>Peso no nascimento:</p>
-                                <strong>{animal.pesoAoNascer}</strong>
-                            </div>
-                            <div>
-                                <p>RGN:</p>
-                                <strong>{animal.rgn}</strong>
-                            </div>
-                         </div>
-                        <div className='flex flex-col gap-4'> 
-                            <div>
-                                <p>Peso no desmame:</p>
-                                <strong>{animal.pesoDoDesmame}</strong>
-                            </div>
-                            <div>
-                                <p>SISBOV:</p>
-                                <strong>{animal.sisBov}</strong>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className='flex w-full gap-6 my-4'>
-                        <div className='flex flex-col gap-4'>
-                            <div>
-                                    <p>Observação:</p>
-                                    <strong>{animal.observacao}</strong>
+                                <img
+                                src={animal.images[0].url}
+                                alt="Imagem"
+                                className="lg:w-9/12 h-1/2 ml-auto sm: w-full" // Classes para definir largura e altura como 50%
+                                />
                             </div>
                         </div>
                     </div>

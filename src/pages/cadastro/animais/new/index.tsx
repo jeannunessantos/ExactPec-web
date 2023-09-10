@@ -10,14 +10,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import {AuthContext} from '../../../../contexts/AuthContext'
 import {v4 as uuidV4} from 'uuid'
 
+import {useParams} from 'react-router-dom'
+
  import {storage,db} from '../../../../services/firebaseConnection'
  import {
     ref,
     uploadBytes,
     getDownloadURL,
-    deleteObject
+    deleteObject,
  } from 'firebase/storage'
-import {addDoc, collection} from 'firebase/firestore'
+import {addDoc, collection, getDoc, doc, updateDoc} from 'firebase/firestore'
 
 
 const schema = z.object({
@@ -55,17 +57,38 @@ interface ImageItemProps{
 
 
 export function CadastroAnimais(){
-
+    const {id} = useParams();
     const {user} =  useContext(AuthContext)
-    const {register, handleSubmit, formState: {errors}, reset} = useForm<FormData>({
+    const {register, handleSubmit, setValue, formState: {errors}, reset} = useForm<FormData>({
         resolver:zodResolver(schema),
         mode:"onChange"
     })
+    
+    useEffect(() => {
+        if(!id){return}
+
+        const docRef = doc(db, "Animais", id);
+        getDoc(docRef)
+        .then((snapshot) => {
+                setValue("nome", snapshot.data()?.nome);
+                setValue("numero",snapshot.data()?.numero);
+                setValue("anoNascimento", snapshot.data()?.anoNascimento);
+                setValue("sexo", snapshot.data()?.sexo);
+                setValue("origem", snapshot.data()?.origem);
+                setValue("composicao", snapshot.data()?.composicao);
+                setValue("puroDeOrigemrigem", snapshot.data()?.puroDeOrigemrigem);
+                setValue("pesoAoNascer", snapshot.data()?.pesoAoNascer);
+                setValue("sisBov", snapshot.data()?.sisBov);
+                setValue("pesoDoDesmame", snapshot.data()?.pesoDoDesmame);
+                setValue("rgn", snapshot.data()?.rgn);
+                setValue("pelagem", snapshot.data()?.pelagem);
+                setValue("observacao", snapshot.data()?.observacao);
+        })
+    }, [])
 
     const [animalImages, setAnimalImage] = useState<ImageItemProps[]>([]);
     const [sexo, setSexo] = useState('');
     const [puroDeOrigemrigem, setPuroDeOrigemrigem] = useState('');
-    
     
     const handleSexoChange = (event: any) => {
         setSexo(event.target.value);
@@ -76,6 +99,14 @@ export function CadastroAnimais(){
       };
 
     function onSubmit(data:FormData){
+        if(id === null || id === undefined){
+            incluir(data)
+        }else{
+            alterar(data);
+        }
+    }
+    
+    function incluir(data:any){
         if(animalImages.length == 0){
             toast.error("Envie alguma imagem deste animal");
             return;
@@ -89,38 +120,45 @@ export function CadastroAnimais(){
             }
         })
 
-        addDoc(collection(db,"Animais"),{
-            nome: data.nome,
-            numero: data.numero,
-            anoNascimento: data.anoNascimento,
-            origem: data.origem,
-            sexo: data.sexo,
-            composicao: data.composicao,
-            puroDeOrigemrigem: data.puroDeOrigemrigem,
-            pelagem: data.pelagem,
-            pesoAoNascer: data.pesoAoNascer,
-            pesoDoDesmame: data.pesoDoDesmame,
-            rgn: data.rgn,
-            sisBov: data.sisBov,
-            observacao: data.observacao,
-            userCadastro: user?.name,
-            userId: user?.uid,
-            dataCadastro: new Date(),
-            images: animalListImages
-        })
+        data.images = animalListImages
+        addDoc(collection(db,"Animais"), data)
         .then(() => {
-            toast.success("Animal cadastrado com sucesso.")
+            toast.success("Registro cadastrado com sucesso.");
             reset();
             setAnimalImage([]);
         }).catch(() => {
+            toast.error("Ocorreu um erro, tente novamente.");
+        })
+    }
 
+    async function alterar(data:any){
+        if(!id)return
+
+        const animalListImages = animalImages.map(animal => {
+            return{
+                uid: animal.uid,
+                name: animal.name,
+                url:animal.url
+            }
+        });
+
+        data.images = animalListImages;
+
+        const docRef = doc(db, "Animais", id);
+        await updateDoc(docRef,data)
+        .then(() => {
+            toast.success("Registro atualizado com sucesso.");
+            reset();
+            setAnimalImage([]);
+        }).catch(() => {
+            toast.error("Ocorreu um erro, tente novamente.");
         })
     }
 
     async function handleFile(e:ChangeEvent<HTMLInputElement>){
         if(e.target.files && e.target.files[0]){
             const image = e.target.files[0]
-            
+            debugger;
             if(image.type === 'image/jpeg' || image.type === 'image/png'){
                 await handleUpload(image)
             }else{
@@ -223,7 +261,7 @@ export function CadastroAnimais(){
                             <div className="w-full">
                                 <p className="mb-2 font-medium">Ano de nasc.</p>
                                 <Input
-                                type="text"
+                                type="Date"
                                 register={register}
                                 name="anoNascimento"
                                 error={errors.anoNascimento?.message}
@@ -232,38 +270,8 @@ export function CadastroAnimais(){
                             </div>
                         </div>
 
-                        <div className="flex w-full mb-3 flex-row items-center gap-4">
-                            <div className="w-full space-x-4">
-                                <p className="font-medium">Sexo</p>
-                                <label className="inline-flex items-center">
-                                    <input
-                                        type="radio"
-                                        {...register("sexo")}
-                                        name="sexo"
-                                        id="sexo1"
-                                        value="0"
-                                        checked={sexo === '0'}
-                                        onChange={handleSexoChange}
-                                    />
-                                    <span className="ml-2">Macho</span>
-                                </label>
-
-                                <label className="inline-flex items-center">
-                                    <input
-                                        type="radio"
-                                        {...register("sexo")}
-                                        name="sexo"
-                                        id="sexo2"
-                                        value="1"
-                                        checked={sexo === '1'}
-                                        onChange={handleSexoChange}
-                                    />
-                                    <span className="ml-2">Fêmea</span>
-                                </label>
-                                {errors.sexo && <p className="mb-1 text-red-500">{errors.sexo?.message}</p>} 
-                            </div>
-
-                            <div className="w-full">
+                        <div className="flex w-full mb-3 flex-row items-center gap-4">                            
+                        <div className="w-full">
                                 <p className="mb-2 font-medium">origem</p>
                                 <Input
                                 type="text"
@@ -272,48 +280,6 @@ export function CadastroAnimais(){
                                 error={errors.origem?.message}
                                 placeholder="Informe a origem"
                                 />
-                            </div>
-                            <div className="w-full">
-                                <p className="mb-2 font-medium">Composição</p>
-                                <Input
-                                type="text"
-                                register={register}
-                                name="composicao"
-                                error={errors.composicao?.message}
-                                placeholder="Informe a composicao"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex w-full mb-3 flex-row items-center gap-4">
-                            <div className="w-full space-x-4">
-                                <p className="font-medium">Puro de origem</p>
-                                <label className="inline-flex items-center">
-                                    <input
-                                        type="radio"
-                                        {...register("puroDeOrigemrigem")}
-                                        name="puroDeOrigemrigem"
-                                        id="puroDeOrigemrigem1"
-                                        value="0"
-                                        checked={puroDeOrigemrigem === '0'}
-                                        onChange={handlePuroDeOrigemrigem}
-                                    />
-                                    <span className="ml-2">SIM</span>
-                                </label>
-
-                                <label className="inline-flex items-center">
-                                    <input
-                                        type="radio"
-                                        {...register("puroDeOrigemrigem")}
-                                        name="puroDeOrigemrigem"
-                                        id="puroDeOrigemrigem2"
-                                        value="1"
-                                        checked={puroDeOrigemrigem === '1'}
-                                        onChange={handlePuroDeOrigemrigem}
-                                    />
-                                    <span className="ml-2">NÃO</span>
-                                </label>
-                                {errors.puroDeOrigemrigem && <p className="mb-1 text-red-500">{errors.puroDeOrigemrigem?.message}</p>} 
                             </div>
 
                             <div className="w-full">
@@ -371,6 +337,79 @@ export function CadastroAnimais(){
                                 />
                             </div>
 
+                        </div>
+                        <div className="flex w-full mb-3 flex-row items-center gap-4">
+                            <div className="w-full space-x-4">
+                                <p className="font-medium">Sexo</p>
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("sexo")}
+                                        name="sexo"
+                                        id="sexo1"
+                                        value="0"
+                                        checked={sexo === '0'}
+                                        onChange={handleSexoChange}
+                                    />
+                                    <span className="ml-2">Macho</span>
+                                </label>
+
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("sexo")}
+                                        name="sexo"
+                                        id="sexo2"
+                                        value="1"
+                                        checked={sexo === '1'}
+                                        onChange={handleSexoChange}
+                                    />
+                                    <span className="ml-2">Fêmea</span>
+                                </label>
+                                {errors.sexo && <p className="mb-1 text-red-500">{errors.sexo?.message}</p>} 
+                            </div>
+
+
+                            <div className="w-full space-x-4">
+                                <p className="font-medium">Puro de origem</p>
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("puroDeOrigemrigem")}
+                                        name="puroDeOrigemrigem"
+                                        id="puroDeOrigemrigem1"
+                                        value="0"
+                                        checked={puroDeOrigemrigem === '0'}
+                                        onChange={handlePuroDeOrigemrigem}
+                                    />
+                                    <span className="ml-2">SIM</span>
+                                </label>
+
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("puroDeOrigemrigem")}
+                                        name="puroDeOrigemrigem"
+                                        id="puroDeOrigemrigem2"
+                                        value="1"
+                                        checked={puroDeOrigemrigem === '1'}
+                                        onChange={handlePuroDeOrigemrigem}
+                                    />
+                                    <span className="ml-2">NÃO</span>
+                                </label>
+                                {errors.puroDeOrigemrigem && <p className="mb-1 text-red-500">{errors.puroDeOrigemrigem?.message}</p>} 
+                            </div>
+
+                            <div className="w-full">
+                                <p className="mb-2 font-medium">Composição</p>
+                                <Input
+                                type="text"
+                                register={register}
+                                name="composicao"
+                                error={errors.composicao?.message}
+                                placeholder="Informe a composicao"
+                                />
+                            </div>
                         </div>
 
                         <div className="mb-3">

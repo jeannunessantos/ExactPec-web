@@ -23,7 +23,7 @@ const router = createBrowserRouter([
         element: <Private><PesquisarAnimais/></Private>
       },
       {
-        path:"/cadastro/animal",
+        path:"/cadastro/animal/:id?",
         element: <Private><CadastroAnimais/></Private>
       },
       {
