@@ -1,5 +1,6 @@
 import { Container } from "../../../components/container";
 import { FiEdit2, FiTrash2, FiFileText, FiPlusCircle } from "react-icons/fi";
+import { ImSearch } from "react-icons/im";
 import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
@@ -161,7 +162,7 @@ export function PesquisarAnimais(){
                       className="bg-blue-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
                       onClick={handleSearchCar}
                       >
-                      Buscar
+                      <ImSearch size='20'/>
                       </button>
                 </section>
                 <main className="grid gird-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1">

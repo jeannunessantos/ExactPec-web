@@ -80,7 +80,7 @@ export function Login() {
             />
           </div>
 
-          <button type="submit" className="bg-zinc-900 w-full rounded-md text-white h-10 font-medium">
+          <button type="submit" className="bg-blue-500 w-full rounded-md text-white h-10 font-medium">
             Acessar
           </button>
 
