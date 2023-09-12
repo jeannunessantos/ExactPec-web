@@ -31,6 +31,12 @@ const schema = z.object({
     }, {
        message: 'O campo sexo é obrigatório.'
     }),
+    situacao: z.string().nullable().refine((situacao) => {
+        return ['0', '1'].includes(situacao == null ? "" : situacao.toLowerCase());
+    }, {
+       message: 'O campo situação é obrigatório.'
+    }),
+
     origem: z.string().nonempty("O campo origem é obrigatório"), 
     composicao: z.string().nonempty("O campo composição é obrigatório"), 
     puroDeOrigemrigem: z.string().nullable().refine((puroDeOrigemrigem) => {
@@ -43,8 +49,7 @@ const schema = z.object({
     pesoDoDesmame: z.string().nonempty("O campo peso do desmame é obrigatório"), 
     rgn: z.string().min(1,"O campo RGN é obrigatório"),
     pelagem: z.string().nonempty("O campo pelagem é obrigatório"),
-    observacao: z.string().nonempty("O campo observação é obrigatório") 
-    
+    observacao: z.string().nonempty("O campo observação é obrigatório"),
 })
 
 type FormData = z.infer<typeof schema>;
@@ -59,6 +64,8 @@ interface ImageItemProps{
 export function CadastroAnimais(){
     const {id} = useParams();
     const {user} =  useContext(AuthContext)
+    const [dataCadastro, setDataCadastro] = useState("");
+
     const {register, handleSubmit, setValue, formState: {errors}, reset} = useForm<FormData>({
         resolver:zodResolver(schema),
         mode:"onChange"
@@ -66,7 +73,7 @@ export function CadastroAnimais(){
     
     useEffect(() => {
         if(!id){return}
-
+        
         const docRef = doc(db, "Animais", id);
         getDoc(docRef)
         .then((snapshot) => {
@@ -83,12 +90,16 @@ export function CadastroAnimais(){
                 setValue("rgn", snapshot.data()?.rgn);
                 setValue("pelagem", snapshot.data()?.pelagem);
                 setValue("observacao", snapshot.data()?.observacao);
+                setValue("situacao", snapshot.data()?.situacao);
+
+                setDataCadastro(snapshot.data()?.dataCadastro);
         })
     }, [])
 
     const [animalImages, setAnimalImage] = useState<ImageItemProps[]>([]);
     const [sexo, setSexo] = useState('');
     const [puroDeOrigemrigem, setPuroDeOrigemrigem] = useState('');
+    const [situacao, setSituacao] = useState('');
     
     const handleSexoChange = (event: any) => {
         setSexo(event.target.value);
@@ -96,6 +107,10 @@ export function CadastroAnimais(){
 
       const handlePuroDeOrigemrigem = (event: any) => {
         setPuroDeOrigemrigem(event.target.value);
+      };
+
+      const handleSituacao = (event: any) => {
+        setSituacao(event.target.value);
       };
 
     function onSubmit(data:FormData){
@@ -143,6 +158,7 @@ export function CadastroAnimais(){
         });
 
         data.images = animalListImages;
+        data.dataCadastro = dataCadastro;
 
         const docRef = doc(db, "Animais", id);
         await updateDoc(docRef,data)
@@ -158,7 +174,7 @@ export function CadastroAnimais(){
     async function handleFile(e:ChangeEvent<HTMLInputElement>){
         if(e.target.files && e.target.files[0]){
             const image = e.target.files[0]
-            debugger;
+            
             if(image.type === 'image/jpeg' || image.type === 'image/png'){
                 await handleUpload(image)
             }else{
@@ -237,6 +253,7 @@ export function CadastroAnimais(){
                     <form className="w-full" 
                         onSubmit={handleSubmit(onSubmit)}>
                         <div className="flex w-full mb-3 flex-row items-center gap-4">
+
                             <div className="w-full">
                                 <p className="mb-2 font-medium">Nome do animal</p>
                                 <Input
@@ -399,6 +416,40 @@ export function CadastroAnimais(){
                                 </label>
                                 {errors.puroDeOrigemrigem && <p className="mb-1 text-red-500">{errors.puroDeOrigemrigem?.message}</p>} 
                             </div>
+
+                            <div className="w-full space-x-4">
+                                <p className="font-medium">Situação</p>
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("situacao")}
+                                        name="situacao"
+                                        id="situacao1"
+                                        value="1"
+                                        checked={situacao === '1'}
+                                        onChange={handleSituacao}
+                                    />
+                                    <span className="ml-2">Ativo</span>
+                                </label>
+
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        {...register("situacao")}
+                                        name="situacao"
+                                        id="situacao2"
+                                        value="0"
+                                        checked={situacao === '0'}
+                                        onChange={handleSituacao}
+                                    />
+                                    <span className="ml-2">Inativo</span>
+                                </label>
+                                {errors.situacao && <p className="mb-1 text-red-500">{errors.situacao?.message}</p>} 
+                            </div>
+
+
+                            
+
 
                             <div className="w-full">
                                 <p className="mb-2 font-medium">Composição</p>

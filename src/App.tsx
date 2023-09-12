@@ -9,6 +9,9 @@ import { New } from './pages/dashboard/new'
 import { Register } from './pages/register'
 import { PesquisarAnimais } from './pages/cadastro/animais'
 import { Private } from './routes/Private'
+import { DetalheFazenda } from './pages/cadastro/fazenda/detail'
+import { CadastroFazenda } from './pages/cadastro/fazenda/new'
+import { PesquisarFazenda } from './pages/cadastro/fazenda'
 
 const router = createBrowserRouter([
   {
@@ -17,6 +20,14 @@ const router = createBrowserRouter([
       {
         path:"/",
         element: <Home/>
+      },
+      {
+        path:"/dashboard",
+        element: <Private><Dashboard/></Private>
+      },
+      {
+        path:"/dashboard/new",
+        element: <Private><New/></Private>
       },
       {
         path:"/pesquisa/animal",
@@ -31,12 +42,16 @@ const router = createBrowserRouter([
         element: <Private><DetalheAnimais/></Private>
       },
       {
-        path:"/dashboard",
-        element: <Private><Dashboard/></Private>
+        path:"/pesquisa/fazenda",
+        element: <Private><PesquisarFazenda/></Private>
       },
       {
-        path:"/dashboard/new",
-        element: <Private><New/></Private>
+        path:"/cadastro/fazenda/:id?",
+        element: <Private><CadastroFazenda/></Private>
+      },
+      {
+        path:"/detalhe/fazenda/:id",
+        element: <Private><DetalheFazenda/></Private>
       }
     ]
   },

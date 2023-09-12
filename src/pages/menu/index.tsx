@@ -20,7 +20,7 @@ function Menu() {
       className={`${
           menuOpen
             ? 'w-2/12 transition-all duration-500 ease-in-out'
-            : 'w-0 overflow-hidden transition-all duration-500 ease-in-out'
+            : 'w-0 overflow-hidden transition-all duration-500 ease-in-out '
         } flex-col bg-blue-500 p-6`}
       >
           <ul className={` ${menuOpen ? 'space-y-2 flex flex-col' : 'space-y-2 flex flex-col justify-center items-center' }`}>
@@ -35,7 +35,7 @@ function Menu() {
                 <Link to='/pesquisa/animal' className="text-white flex items-center"> {menuOpen ? (<><GiCow size='20'/> <span className="ml-2">Animais</span></>):(<GiCow size='20'/>)} </Link>
               </li>
               <li>
-                <Link to='/cadastro/animal' className="text-white flex items-center"> {menuOpen ? (<><GiFarmer size='20'/> <span className="ml-2">Propriedade</span></>) : (<GiFarmer size='20'/>)} </Link>
+                <Link to='/pesquisa/fazenda' className="text-white flex items-center"> {menuOpen ? (<><GiFarmer size='20'/> <span className="ml-2">Propriedade</span></>) : (<GiFarmer size='20'/>)} </Link>
               </li>
           </ul>
       </nav>

@@ -46,7 +46,7 @@ export function PesquisarAnimais(){
 
     function loadAnimais(){
         const animaisRef = collection(db, "Animais")
-        const queryRef = query(animaisRef, orderBy("dataCadastro", "desc"))
+        const queryRef = query(animaisRef)
         getDocs(queryRef)
         .then((snapshot) => {
         let listAnimais = [] as AnimaisProps[];
@@ -77,7 +77,7 @@ export function PesquisarAnimais(){
         })
     }
 
-    async function handleSearchCar(){
+    async function handleSearchAnimal(){
         if(input === ''){
             loadAnimais();
           return;
@@ -151,20 +151,23 @@ export function PesquisarAnimais(){
         <Container>
           <div className="w-full">
             <div className="flex-col">
-                <section className="bg-white p-4 rounded-lg w- max-w-3xl mx-auto flex justify-center items-center gap-2">
+
+                <section className="bg-white p-2 rounded-lg w-full max-w-3xl mx-auto flex justify-center items-center gap-2">
                       <input
-                      className="w-full border-2 rounded-lg h-9 px-3 outline-none"
-                      placeholder="Digite o nome do animal..."
-                      value={input}
-                      onChange={ (e) => setInput(e.target.value) }
+                        className="w-full border-2 rounded-lg h-9 px-3 outline-none"
+                        placeholder="Digite o nome do animal..."
+                        value={input}
+                        onChange={ (e) => setInput(e.target.value) }
                       />
+
                       <button
-                      className="bg-blue-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
-                      onClick={handleSearchCar}
+                        className="bg-blue-500 h-9 px-8 rounded-lg text-white font-medium text-lg"
+                        onClick={handleSearchAnimal}
                       >
                       <ImSearch size='20'/>
                       </button>
                 </section>
+                
                 <main className="grid gird-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1">
                   {animais && animais.length ? (
                       <div className="overflow-x-auto">
