@@ -15,6 +15,9 @@ import { PesquisarFazenda } from './pages/cadastro/fazenda'
 import { PesquisarEmpresa } from './pages/cadastro/empresa'
 import { CadastroEmpresa } from './pages/cadastro/empresa/new'
 import { DetalheEmpresa } from './pages/cadastro/empresa/detail'
+import { PesquisarRaca } from './pages/cadastro/raca'
+import { CadastroRaca } from './pages/cadastro/raca/new'
+import { DetalheRaca } from './pages/cadastro/raca/detail'
 
 const router = createBrowserRouter([
   {
@@ -67,6 +70,18 @@ const router = createBrowserRouter([
       {
         path:"/detalhe/empresa/:id",
         element: <Private><DetalheEmpresa/></Private>
+      },
+      {
+        path:"/pesquisa/raca",
+        element: <Private><PesquisarRaca/></Private>
+      },
+      {
+        path:"/cadastro/raca/:id?",
+        element: <Private><CadastroRaca/></Private>
+      },
+      {
+        path:"/detalhe/raca/:id",
+        element: <Private><DetalheRaca/></Private>
       }
     ]
   },

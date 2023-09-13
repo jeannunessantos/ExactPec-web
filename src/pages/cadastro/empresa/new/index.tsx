@@ -79,7 +79,7 @@ export function CadastroEmpresa(){
         }).catch(() => {
             toast.error("Ocorreu um erro, tente novamente.");
         })
-      }
+    }
   
       async function alterar(data:any){
         if(!id)return

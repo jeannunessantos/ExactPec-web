@@ -35,10 +35,13 @@ function Menu() {
                 <Link to='/dashboard' className="text-white flex items-center"> {menuOpen ? (<><MdDashboardCustomize size='20'/>  <span className="ml-2">Dashboard</span></>) : (<MdDashboardCustomize size='20'/>)} </Link>
               </li>
               <li>
-                <Link to='/pesquisa/animal' className="text-white flex items-center"> {menuOpen ? (<><GiCow size='20'/> <span className="ml-2">Animais</span></>):(<GiCow size='20'/>)} </Link>
+                <Link to='/pesquisa/fazenda' className="text-white flex items-center"> {menuOpen ? (<><GiFarmer size='20'/> <span className="ml-2">Propriedade</span></>) : (<GiFarmer size='20'/>)} </Link>
               </li>
               <li>
-                <Link to='/pesquisa/fazenda' className="text-white flex items-center"> {menuOpen ? (<><GiFarmer size='20'/> <span className="ml-2">Propriedade</span></>) : (<GiFarmer size='20'/>)} </Link>
+                <Link to='/pesquisa/animal' className="text-white flex items-center">{menuOpen ? (<><GiCow size='20'/> <span className="ml-2">Animais</span></>) : (<GiCow size='20'/>)}</Link>
+              </li>
+              <li>
+                <Link to='/pesquisa/raca' className="text-white flex items-center"> {menuOpen ? (<><GiCow size='20'/> <span className="ml-2">Raça</span></>) : (<GiCow size='20'/>)}</Link>
               </li>
               <li>
                 <Link to='/pesquisa/empresa' className="text-white flex items-center"> {menuOpen ? (<><GoOrganization size='20'/> <span className="ml-2">Empresa</span></>) : (<GoOrganization size='20'/>)} </Link>
