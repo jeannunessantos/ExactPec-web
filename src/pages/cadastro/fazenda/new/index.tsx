@@ -50,7 +50,7 @@ export function CadastroFazenda(){
 
               setDataCadastro(snapshot.data()?.dataCadastro);
       })
-  }, [])
+    }, [])
 
     function onSubmit(data:FormData){
         if(id === null || id === undefined){
@@ -104,7 +104,7 @@ export function CadastroFazenda(){
 
                 <div className="flex w-full mb-3 flex-row items-center gap-4">
                   <div className="w-full">
-                    <p className="mb-2 font-medium">Nome do animal</p>
+                    <p className="mb-2 font-medium">Nome da fazenda</p>
                     <Input
                       type="text"
                       register={register}

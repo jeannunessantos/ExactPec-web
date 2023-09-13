@@ -4,6 +4,9 @@ import { FaBars } from 'react-icons/fa';
 import {FiHome } from 'react-icons/fi';
 import {GiCow, GiFarmer } from 'react-icons/gi';
 import {MdDashboardCustomize } from 'react-icons/md';
+import {GoOrganization } from 'react-icons/go';
+
+
 import {AuthContext} from '../../contexts/AuthContext'
 import {useContext} from 'react'
 
@@ -36,6 +39,9 @@ function Menu() {
               </li>
               <li>
                 <Link to='/pesquisa/fazenda' className="text-white flex items-center"> {menuOpen ? (<><GiFarmer size='20'/> <span className="ml-2">Propriedade</span></>) : (<GiFarmer size='20'/>)} </Link>
+              </li>
+              <li>
+                <Link to='/pesquisa/empresa' className="text-white flex items-center"> {menuOpen ? (<><GoOrganization size='20'/> <span className="ml-2">Empresa</span></>) : (<GoOrganization size='20'/>)} </Link>
               </li>
           </ul>
       </nav>

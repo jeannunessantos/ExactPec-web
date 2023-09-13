@@ -1,0 +1,5 @@
+export function DetalheEmpresa(){
+    return(
+        <></>
+    )
+}

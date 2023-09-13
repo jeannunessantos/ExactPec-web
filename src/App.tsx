@@ -12,6 +12,9 @@ import { Private } from './routes/Private'
 import { DetalheFazenda } from './pages/cadastro/fazenda/detail'
 import { CadastroFazenda } from './pages/cadastro/fazenda/new'
 import { PesquisarFazenda } from './pages/cadastro/fazenda'
+import { PesquisarEmpresa } from './pages/cadastro/empresa'
+import { CadastroEmpresa } from './pages/cadastro/empresa/new'
+import { DetalheEmpresa } from './pages/cadastro/empresa/detail'
 
 const router = createBrowserRouter([
   {
@@ -52,6 +55,18 @@ const router = createBrowserRouter([
       {
         path:"/detalhe/fazenda/:id",
         element: <Private><DetalheFazenda/></Private>
+      },
+      {
+        path:"/pesquisa/empresa",
+        element: <Private><PesquisarEmpresa/></Private>
+      },
+      {
+        path:"/cadastro/empresa/:id?",
+        element: <Private><CadastroEmpresa/></Private>
+      },
+      {
+        path:"/detalhe/empresa/:id",
+        element: <Private><DetalheEmpresa/></Private>
       }
     ]
   },
