@@ -10,6 +10,28 @@ import {toast} from 'react-hot-toast'
 import {addDoc, collection, getDoc, doc, updateDoc} from 'firebase/firestore'
 import {db} from '../../../../services/firebaseConnection'
 
+const schema = z.object({
+  nome: z.string().nonempty("O campo nome é obrigatório"),
+  inscricaoMunicipal: z.string().nonempty("O campo inscrição municipal é obrigatório"),
+  inscricaoEstadual: z.string().nonempty("O campo inscrição estadual é obrigatório"),
+  telefone: z.string().nonempty("O campo telefone é obrigatório"),
+  email: z.string().nonempty("O campo email é obrigatório"),
+  documento: z.string().nonempty("O campo documento é obrigatório"),
+  responsavel: z.string().nonempty("O campo responsável é obrigatório"),
+  situacao: z.string().nullable().refine((situacao) => {
+      return ['0', '1'].includes(situacao == null ? "" : situacao.toLowerCase());
+  }, {
+     message: 'O campo situação é obrigatório.'
+  }),
+  tipoDocumento: z.string().nullable().refine((tipoDocumento) => {
+      return ['1', '2', '3'].includes(tipoDocumento == null ? "" : tipoDocumento.toLowerCase());
+  }, {
+     message: 'O campo tipo de documento é obrigatório.'
+  })
+})
+
+type FormData = z.infer<typeof schema>;
+
 export function CadastroEmpresa(){
 
     const {id} = useParams();
@@ -17,25 +39,7 @@ export function CadastroEmpresa(){
     const [situacao, setSituacao] = useState('');
     const [tipoDocumento, setTipoDeDocumento] = useState('');
 
-    const schema = z.object({
-        nome: z.string().nonempty("O campo nome é obrigatório"),
-        inscricaoMunicipal: z.string().nonempty("O campo inscrição municipal é obrigatório"),
-        inscricaoEstadual: z.string().nonempty("O campo inscrição estadual é obrigatório"),
-        telefone: z.string().nonempty("O campo telefone é obrigatório"),
-        email: z.string().nonempty("O campo email é obrigatório"),
-        documento: z.string().nonempty("O campo documento é obrigatório"),
-        responsavel: z.string().nonempty("O campo responsável é obrigatório"),
-        situacao: z.string().nullable().refine((situacao) => {
-            return ['0', '1'].includes(situacao == null ? "" : situacao.toLowerCase());
-        }, {
-           message: 'O campo situação é obrigatório.'
-        }),
-        tipoDocumento: z.string().nullable().refine((tipoDocumento) => {
-            return ['1', '2', '3'].includes(tipoDocumento == null ? "" : tipoDocumento.toLowerCase());
-        }, {
-           message: 'O campo tipo de documento é obrigatório.'
-        })
-    })
+    
 
     const {register, handleSubmit, setValue, formState: {errors}, reset} = useForm<FormData>({
         resolver:zodResolver(schema),

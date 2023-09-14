@@ -10,27 +10,30 @@ import {toast} from 'react-hot-toast'
 import {addDoc, collection, getDoc, doc, updateDoc} from 'firebase/firestore'
 import {db} from '../../../../services/firebaseConnection'
 
+
+const schema = z.object({
+  nome: z.string().nonempty("O campo nome é obrigatório"),
+  situacao: z.string().nullable().refine((situacao) => {
+      return ['0', '1'].includes(situacao == null ? "" : situacao.toLowerCase());
+  }, {
+     message: 'O campo situação é obrigatório.'
+  }),
+
+  tipoDeControleDoAnimal: z.string().nullable().refine((tipoDeControleDoAnimal) => {
+      return ['1', '2', '3'].includes(tipoDeControleDoAnimal == null ? "" : tipoDeControleDoAnimal.toLowerCase());
+  }, {
+     message: 'O campo tipo de controle é obrigatório.'
+  })
+})
+
+type FormData = z.infer<typeof schema>;
+
 export function CadastroFazenda(){
 
     const {id} = useParams();
     const [dataCadastro, setDataCadastro] = useState("");
     const [situacao, setSituacao] = useState('');
     const [tipoDeControleDoAnimal, setTipoDeControleDoAnimal] = useState('');
-
-    const schema = z.object({
-        nome: z.string().nonempty("O campo nome é obrigatório"),
-        situacao: z.string().nullable().refine((situacao) => {
-            return ['0', '1'].includes(situacao == null ? "" : situacao.toLowerCase());
-        }, {
-           message: 'O campo situação é obrigatório.'
-        }),
-
-        tipoDeControleDoAnimal: z.string().nullable().refine((tipoDeControleDoAnimal) => {
-            return ['1', '2', '3'].includes(tipoDeControleDoAnimal == null ? "" : tipoDeControleDoAnimal.toLowerCase());
-        }, {
-           message: 'O campo tipo de controle é obrigatório.'
-        })
-    })
 
     const {register, handleSubmit, setValue, formState: {errors}, reset} = useForm<FormData>({
         resolver:zodResolver(schema),

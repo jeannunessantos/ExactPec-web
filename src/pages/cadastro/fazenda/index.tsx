@@ -18,7 +18,7 @@ export function PesquisarFazenda(){
         nome: string,
         tipoDeControleDaFazenda: string,
         situacao: number,
-        dataCadastro: Date,
+        dataCadastro: string,
     }
 
     useEffect(() => {
@@ -37,8 +37,8 @@ export function PesquisarFazenda(){
                 id: doc.id,
                 nome: doc.data().nome,
                 situacao: doc.data().situacao,
-                tipoDeControleDaFazenda: doc.data().tipoDeControleDaFazenda
-
+                tipoDeControleDaFazenda: doc.data().tipoDeControleDaFazenda,
+                dataCadastro: doc.data().dataCadastro
             })
         })
         setFazendas(listFazendas);  
@@ -65,7 +65,8 @@ export function PesquisarFazenda(){
                 id: doc.id,
                 nome: doc.data().nome,
                 situacao: doc.data().situacao,
-                tipoDeControleDaFazenda: doc.data().tipoDeControleDaFazenda
+                tipoDeControleDaFazenda: doc.data().tipoDeControleDaFazenda,
+                dataCadastro:doc.data().dataCadastro
             })
         });
 

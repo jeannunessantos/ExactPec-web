@@ -4,7 +4,7 @@ import { ImSearch } from "react-icons/im";
 import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
-import { collection, getDocs, query, doc, deleteDoc, orderBy, where } from 'firebase/firestore'
+import { collection, getDocs, query, doc, deleteDoc, where } from 'firebase/firestore'
 import { db, storage } from '../../../services/firebaseConnection'
 import { ref, deleteObject } from 'firebase/storage'
 
