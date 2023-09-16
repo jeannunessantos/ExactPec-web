@@ -19,6 +19,10 @@ import { PesquisarRaca } from './pages/cadastro/raca'
 import { CadastroRaca } from './pages/cadastro/raca/new'
 import { DetalheRaca } from './pages/cadastro/raca/detail'
 
+import { PesquisarArea } from './pages/cadastro/area'
+import { CadastroArea } from './pages/cadastro/area/new'
+import { DetalheArea } from './pages/cadastro/area/detail'
+
 const router = createBrowserRouter([
   {
     element: <Layout/>,
@@ -82,6 +86,18 @@ const router = createBrowserRouter([
       {
         path:"/detalhe/raca/:id",
         element: <Private><DetalheRaca/></Private>
+      },
+      {
+        path:"/pesquisa/area",
+        element: <Private><PesquisarArea/></Private>
+      },
+      {
+        path:"/cadastro/area/:id?",
+        element: <Private><CadastroArea/></Private>
+      },
+      {
+        path:"/detalhe/area/:id",
+        element: <Private><DetalheArea/></Private>
       }
     ]
   },

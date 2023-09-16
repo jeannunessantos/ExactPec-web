@@ -5,6 +5,7 @@ import {FiHome } from 'react-icons/fi';
 import {GiCow, GiFarmer } from 'react-icons/gi';
 import {MdDashboardCustomize } from 'react-icons/md';
 import {GoOrganization } from 'react-icons/go';
+import {TbChartAreaLine } from 'react-icons/tb';
 
 
 import {AuthContext} from '../../contexts/AuthContext'
@@ -45,6 +46,9 @@ function Menu() {
               </li>
               <li>
                 <Link to='/pesquisa/empresa' className="text-white flex items-center"> {menuOpen ? (<><GoOrganization size='20'/> <span className="ml-2">Empresa</span></>) : (<GoOrganization size='20'/>)} </Link>
+              </li>
+              <li>
+                <Link to='/pesquisa/area' className="text-white flex items-center"> {menuOpen ? (<><TbChartAreaLine size='20'/> <span className="ml-2">Área</span></>) : (<TbChartAreaLine size='20'/>)} </Link>
               </li>
           </ul>
       </nav>
