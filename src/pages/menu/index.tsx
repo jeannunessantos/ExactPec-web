@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { FaBars } from 'react-icons/fa';
 import {FiHome } from 'react-icons/fi';
 import {GiCow, GiFarmer } from 'react-icons/gi';
-import {MdDashboardCustomize } from 'react-icons/md';
+import {MdDashboardCustomize, MdOutlineBatchPrediction } from 'react-icons/md';
 import {GoOrganization } from 'react-icons/go';
 import {TbChartAreaLine } from 'react-icons/tb';
+
 
 
 import {AuthContext} from '../../contexts/AuthContext'
@@ -49,6 +50,9 @@ function Menu() {
               </li>
               <li>
                 <Link to='/pesquisa/area' className="text-white flex items-center"> {menuOpen ? (<><TbChartAreaLine size='20'/> <span className="ml-2">Área</span></>) : (<TbChartAreaLine size='20'/>)} </Link>
+              </li>
+              <li>
+                <Link to='/pesquisa/lote' className="text-white flex items-center"> {menuOpen ? (<><MdOutlineBatchPrediction size='20'/> <span className="ml-2">Lote</span></>) : (<MdOutlineBatchPrediction size='20'/>)} </Link>
               </li>
           </ul>
       </nav>

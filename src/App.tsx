@@ -22,6 +22,9 @@ import { DetalheRaca } from './pages/cadastro/raca/detail'
 import { PesquisarArea } from './pages/cadastro/area'
 import { CadastroArea } from './pages/cadastro/area/new'
 import { DetalheArea } from './pages/cadastro/area/detail'
+import { PesquisarLote } from './pages/cadastro/lote'
+import { CadastroLote } from './pages/cadastro/lote/new'
+import { DetalheLote } from './pages/cadastro/lote/detail'
 
 const router = createBrowserRouter([
   {
@@ -98,6 +101,18 @@ const router = createBrowserRouter([
       {
         path:"/detalhe/area/:id",
         element: <Private><DetalheArea/></Private>
+      },
+      {
+        path:"/pesquisa/lote",
+        element: <Private><PesquisarLote/></Private>
+      },
+      {
+        path:"/cadastro/lote/:id?",
+        element: <Private><CadastroLote/></Private>
+      },
+      {
+        path:"/detalhe/lote/:id",
+        element: <Private><DetalheLote/></Private>
       }
     ]
   },
