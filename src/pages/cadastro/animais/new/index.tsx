@@ -1,6 +1,8 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { FiUpload, FiTrash } from "react-icons/fi";
+//import { ImSearch } from "react-icons/im";
 import { Container } from "../../../../components/container";
+//import ModalPesquisa from '../../../../components/modal/modalPesquisa';
 import { DashboardHeader } from "../../../../components/painelHeader";
 import { useForm } from 'react-hook-form'
 import { Input } from '../../../../components/input'
@@ -100,6 +102,8 @@ export function CadastroAnimais(){
     const [sexo, setSexo] = useState('');
     const [puroDeOrigemrigem, setPuroDeOrigemrigem] = useState('');
     const [situacao, setSituacao] = useState('');
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [searchResult, setSearchResult] = useState('');
     
     const handleSexoChange = (event: any) => {
         setSexo(event.target.value);
@@ -217,6 +221,12 @@ export function CadastroAnimais(){
         } catch (error) {
         }
     }
+
+//   const handleSearch = (term: any) => {
+//     // Lógica de pesquisa aqui, por exemplo, buscar o resultado com base no termo de pesquisa.
+//     setSearchResult(`Search result for: ${term}`);
+//     setIsModalOpen(false);
+//   };
 
     return(
         <div>
@@ -446,11 +456,6 @@ export function CadastroAnimais(){
                                 </label>
                                 {errors.situacao && <p className="mb-1 text-red-500">{errors.situacao?.message}</p>} 
                             </div>
-
-
-                            
-
-
                             <div className="w-full">
                                 <p className="mb-2 font-medium">Composição</p>
                                 <Input
@@ -462,6 +467,36 @@ export function CadastroAnimais(){
                                 />
                             </div>
                         </div>
+
+
+
+                        {/* <div className="flex w-full mb-3 flex-row items-center gap-4">
+                            <div className="w-full">
+                                    <p className="mb-2 font-medium">Empresa</p>
+                                    <Input
+                                    type="text"
+                                    register={register}
+                                    name="composicao"
+                                    error={errors.composicao?.message}
+                                    placeholder="Informe a composicao"
+                                    />
+                                </div>
+                                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={() => setIsModalOpen(true)}>
+                                    <ImSearch size="25px"/>
+                                </button>
+
+                            </div>
+                                <ModalPesquisa
+                                isOpen={isModalOpen}
+                                onClose={() => setIsModalOpen(false)}
+                                onSearch={() => handleSearch}
+                                NmPesquisa = "Nome"
+                                /> */}
+
+
+
+
+
 
                         <div className="mb-3">
                             <p className="mb-2 font-medium">Observação</p>
